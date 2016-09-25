@@ -1,0 +1,170 @@
+---
+title: 'researcher-level metrics blog post'
+author: "Heather Piwowar and Jason Priem"
+output:
+  html_document:
+    fig_caption: yes
+    force_captions: yes
+    highlight: pygments
+    keep_md: yes
+    number_sections: no
+    pandoc_args:
+    - +RTS
+    - -K10000000
+    - -RTS
+  md_document:
+    variant: markdown_github
+  pdf_document:
+    fig_caption: yes
+    keep_md: yes
+    keep_tex: yes
+    latex_engine: xelatex
+---
+
+*This paper is still in progress. Feel free to submit a pull request with updates and changes.*
+
+
+```{r setup, echo=FALSE}
+library(knitr)
+opts_knit$set(progress=TRUE, tidy=TRUE, echo=TRUE)
+```
+
+```{r knitcitations, echo=FALSE}
+  # devtools::install_github("cboettig/knitcitations@v1")
+  library(knitcitations); cleanbib()
+  cite_options(citation_format = "pandoc", check.entries=FALSE)
+  library(bibtex)
+```
+
+```{r load_libraries, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+library(magrittr)
+library(ggplot2)
+library(dplyr)
+library(broom)
+library(RJDBC)
+library(reshape)
+library(plyr); library(dplyr)
+library(scales)
+library(corrplot)
+```
+
+```{r get_data, echo=FALSE, results='hide', cache=TRUE}
+
+profiles <- read.csv("profiles.csv")
+```
+
+```{r echo=TRUE}
+# subset by >25 events ad condition the columns
+profiles_bool <- profiles %>% select(-id) 
+# profiles_bool <- profiles %>% select(-id) %>% select(-posts) %>% select(-accounts) 
+#profiles_bool[profiles_bool>0] <- 1
+#profiles_bool[1,] <- 0  # hack to make corr not explode
+
+#corrplot(cor(profiles_bool), type='lower', order='FPC', method='color')
+```
+
+
+how prevelant are different kinds of success for each person (by metric)
+```{r}
+# by metric
+number_of_people = nrow(profiles)
+channels = profiles %>% select(blogs:wikipedia) %>% melt
+nonzero_channels =  channels %>% filter(value>1)
+
+nonzero_channels %>% ggplot( aes(reorder(variable, variable, length)) ) +
+  geom_bar(aes(y=..count../6583)) +
+  coord_flip() +
+  scale_y_continuous(labels = percent) +
+  ggtitle("Percentage people with research mentioned on a given channel \n(people with at least 20 mentions)") +
+  ylab("Percentage of people") +
+  xlab("Channel")
+```
+
+how prevelant are different kinds of success for each person (overall)
+```{r}
+# number of sources
+profiles %>% ggplot( aes(num_sources) ) + geom_histogram(binwidth=1)
+profiles %>% ggplot( aes(num_sources) ) + geom_histogram(binwidth=1, aes(y=cumsum(..count..)))
+
+# number of posts
+profiles %>% ggplot( aes(posts) ) + geom_histogram()
+profiles %>% ggplot( aes(posts) ) + geom_histogram() + scale_x_log10() 
+profiles$posts %>% median
+
+# altmetric scores
+profiles %>% ggplot( aes(altmetric_score) ) + geom_histogram()
+profiles %>% ggplot( aes(altmetric_score) ) + geom_histogram() + scale_x_log10() 
+profiles$altmetric_score %>% median
+
+# altmetric scores, zoom in on the meat
+profiles %>% filter(altmetric_score < 250) %>% ggplot( aes(altmetric_score) ) + geom_histogram()
+
+# activity, as defined by having stuff in each of the last three months
+profiles %>% filter(monthly_event_count < 30) %>% ggplot( aes(monthly_event_count) ) + geom_histogram(binwidth=1)
+profiles %>% filter(monthly_event_count < 30) %>% ggplot( aes(monthly_event_count) ) + geom_histogram(binwidth=1, aes(y=cumsum(..count..)))
+
+# how many have monthly events at all
+profiles %>% filter(monthly_event_count > 0) %>% nrow
+profiles %>% filter(monthly_event_count == 0) %>% nrow
+
+```
+
+
+
+
+
+lets see how counts various metrics relate to one another
+
+First, the number of sources vs the number of posts
+```{r}
+head(profiles)
+
+# sources vs posts
+profiles %>%  ggplot(aes(num_sources, posts))  + geom_jitter(alpha=0.5) 
+cor(profiles$num_sources, profiles$posts)
+cor(profiles$num_sources, log10(profiles$posts))
+```
+* moderate correlation goes up noticebly when you log-transform posts
+
+
+Let's look at the relationship between the altmetric score vs posts/tweets
+```{r}
+
+# altmetric score vs posts
+profiles %>%  ggplot(aes(posts, altmetric_score))  + geom_point(alpha=.2) + scale_x_log10() + scale_y_log10()
+cor(log10(profiles$altmetric_score), log10(profiles$posts), use='complete.obs')
+cor(profiles$altmetric_score, profiles$posts, use='complete.obs')  # makes no difference
+
+
+# altmetric score vs twitter
+profiles %>%  ggplot(aes(twitter, altmetric_score))  + geom_point(alpha=0.2) + scale_x_log10() + scale_y_log10()
+cor(log10(profiles$altmetric_score), log10(profiles$twitter))
+
+```
+
+* correlations really strong, only a bit less strong when you use tweets instead of posts.
+
+
+Lets take a look at the t-index
+```{r}
+
+# altmetric score vs t-index
+profiles %>% ggplot( aes(t_index) ) + geom_histogram(binwidth=1, aes(y=cumsum(..count..)))
+profiles$t_index %>% median
+
+
+profiles %>%  ggplot(aes(t_index, altmetric_score))  + geom_jitter(alpha=0.2) + scale_x_log10() + scale_y_log10() 
+
+cor(profiles$altmetric_score, profiles$t_index)
+cor(log10(profiles$altmetric_score), log10(profiles$t_index))
+
+```
+
+* everything above 800 on the graph is the top 5%, which is convenient for estimating. so t-index=12 is the top 5 percentile.
+* the median of 4 suggests that we could maybe do a badge for everyone who's got a 5 or better.
+* surprisingly good correlation between t-index and both altmetric score and posts count, even after log-transform
+
+
+
+
+

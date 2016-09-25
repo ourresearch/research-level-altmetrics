@@ -1,0 +1,15 @@
+base
+knitr
+knitcitations
+bibtex
+magrittr
+ggplot2
+dplyr
+broom
+DBI
+rJava
+RJDBC
+reshape
+plyr
+scales
+corrplot
