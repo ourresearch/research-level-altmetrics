@@ -1,5 +1,5 @@
 ---
-title: 'researcher-level metrics blog post'
+title: 'Researcher-level altmetrics paper'
 author: "Heather Piwowar and Jason Priem"
 output:
   html_document:
@@ -21,8 +21,7 @@ output:
     latex_engine: xelatex
 ---
 
-*This paper is still in progress. Feel free to submit a pull request with updates and changes.*
-
+*We're presenting this paper at the [3:AM conference](http://altmetricsconference.com/schedule/) in Bucharest, 28-29 Sept 2016. Once it's a bit more polished we plan to upload it to the ArXiv. It's very much a work in progress; feel free to submit pull requests with updates and changes.*
 
 ```{r setup, echo=FALSE}
 library(knitr)
@@ -53,15 +52,40 @@ library(corrplot)
 profiles <- read.csv("profiles.csv")
 ```
 
-```{r echo=TRUE}
-# subset by >25 events ad condition the columns
-profiles_bool <- profiles %>% select(-id) 
-# profiles_bool <- profiles %>% select(-id) %>% select(-posts) %>% select(-accounts) 
-#profiles_bool[profiles_bool>0] <- 1
-#profiles_bool[1,] <- 0  # hack to make corr not explode
+## researcher-level altmetrics
 
-#corrplot(cor(profiles_bool), type='lower', order='FPC', method='color')
-```
+* This section still needs its citations...*
+ 
+There's been a lot of work examining the distribution and properties of altmetrics at the level of individual papers, and sensibly so. Since this is the lowest level of aggregation, it's a great place to start. Researchers have also looked at altmetrics by journal, following a long trend of journal-level citation bibliometrics work. However, there's surprisingly little work on altmetrics at the *researcher* level. 
+
+And the researcher level matters. Researchers decide what to study, where to publish, and how to publish it. And they are exceedingly aware of impact metrics, and the massive affect of these metrics on their careers. So, effective and meaningful researcher-level altmetrics could powerfully impact scholarly communication.
+
+Of course, altmetrics will take some time to become effective and meaningful. But in the meantime, it's useful to examine the distribution and character of researcher-level altmetrics, to test the potential of these metrics for real evaluation. 
+
+
+## ORCID as a source for researcher-level altmetrics 
+Finding data at the reseacher level is not simple, since many commercial researcher databases like Google Scholar (shamefully) prohibit systematic analysis of their data. However, the growth of the ORCID ID system gives us an opportunity to study and open dataset of scholars and their publications. And the [2015 ORCID public data file](https://figshare.com/articles/ORCID_Public_Data_File_2015/1582705) is available for download and re-use.
+
+Using ORCID profiles does have some difficulties. Unlike systems such as Google Scholar, ORCID does not automatically add a users' publications. It must be done manually, and it is not a particularly user-friendly process. Because of this, most ORCIDs do not include a complete publication list. This is particularly true since most  ORCIDs are created as part of a single-signon flow for another system (an academic version of the ubiquitous "sign in with Facebook" button). These users just want an account, and have no interest in making a complete publication list.
+
+We solved this problem by using clues in ORCID records to find users who have spent significant amounts of time editing their profiles, on the assumption that these users are likely to have assembled a relatively complete publication list. After trying several different clues, we settled on two: users were more likely to have complete publications list if they 
+1. Had at least one publication with a DOI from 2015 and
+2. Had added a custom URL to their homepage.
+
+This significantly narrowed our sample from the 2015 public data file, from 1.6M to 17k:
+
+| Total ORCID accounts          | 1.6M |
+|-------------------------------|------|
+| With DOIs                     | 215k |
+| With 2015 DOIs                | 62k  |
+| With 2015 DOIs and custom URL | 17k  |
+
+## How much altmetrics activity to these researchers have?
+
+
+
+
+
 
 
 how prevelant are different kinds of success for each person (by metric)

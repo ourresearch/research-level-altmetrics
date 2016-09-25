@@ -1,7 +1,7 @@
-# researcher-level metrics blog post
+# Researcher-level altmetrics paper
 Heather Piwowar and Jason Priem  
 
-*This paper is still in progress. Feel free to submit a pull request with updates and changes.*
+*We're presenting this paper at the [3:AM conference](http://altmetricsconference.com/schedule/) in Bucharest, 28-29 Sept 2016. Once it's a bit more polished we plan to upload it to the ArXiv. It's very much a work in progress; feel free to submit pull requests with updates and changes.*
 
 
 
@@ -11,17 +11,34 @@ Heather Piwowar and Jason Priem
 
 
 
+## researcher-level altmetrics
+There's been a lot of work examining the distribution and properties of altmetrics at the level of individual papers, and sensibly so. Since this is the lowest level of aggregation, it's a great place to start. Researchers have also looked at altmetrics by journal, following a long trend of journal-level citation bibliometrics work. *Add citations*. However, there's surprisingly little work on altmetrics at the *researcher* level. 
+
+And the researcher level matters. Researchers decide what to study, where to publish, and how to publish it. And they are exceedingly aware of impact metrics, and the massive affect of these metrics on their careers. So, effective and meaningful researcher-level altmetrics could powerfully impact scholarly communication.
+
+Of course, altmetrics will take some time to become effective and meaningful. But in the meantime, it's useful to examine the distribution and character of researcher-level altmetrics, to test the potential of these metrics for real evaluation. 
+
+## ORCID as a source for researcher-level altmetrics 
+Finding data at the reseacher level is not simple, since many commercial researcher databases like Google Scholar (shamefully) prohibit systematic analysis of their data. However, the growth of the ORCID ID system gives us an opportunity to study and open dataset of scholars and their publications. And the [2015 ORCID public data file](https://figshare.com/articles/ORCID_Public_Data_File_2015/1582705) is available for download and re-use.
+
+Using ORCID profiles does have some difficulties. Unlike systems such as Google Scholar, ORCID does not automatically add a users' publications. It must be done manually, and it is not a particularly user-friendly process. Because of this, most ORCIDs do not include a complete publication list. This is particularly true since most  ORCIDs are created as part of a single-signon flow for another system (an academic version of the ubiquitous "sign in with Facebook" button). These users just want an account, and have no interest in making a complete publication list.
+
+We solved this problem by using clues in ORCID records to find users who have spent significant amounts of time editing their profiles, on the assumption that these users are likely to have assembled a relatively complete publication list. After trying several different clues, we settled on two: users were more likely to have complete publications list if they 
+1. Had at least one publication with a DOI from 2015 and
+2. Had added a custom URL to their homepage.
+
+This significantly narrowed our sample from the 2015 public data file:
+
+| Total ORCID accounts          | 1.6M |
+|-------------------------------|------|
+| With DOIs                     | 215k |
+| With 2015 DOIs                | 62k  |
+| With 2015 DOIs and custom URL | 17k  |
 
 
-```r
-# subset by >25 events ad condition the columns
-profiles_bool <- profiles %>% select(-id) 
-# profiles_bool <- profiles %>% select(-id) %>% select(-posts) %>% select(-accounts) 
-#profiles_bool[profiles_bool>0] <- 1
-#profiles_bool[1,] <- 0  # hack to make corr not explode
 
-#corrplot(cor(profiles_bool), type='lower', order='FPC', method='color')
-```
+
+
 
 
 how prevelant are different kinds of success for each person (by metric)
@@ -48,7 +65,7 @@ nonzero_channels %>% ggplot( aes(reorder(variable, variable, length)) ) +
   xlab("Channel")
 ```
 
-![](post_files/figure-html/unnamed-chunk-2-1.png) 
+![](post_files/figure-html/unnamed-chunk-1-1.png) 
 
 how prevelant are different kinds of success for each person (overall)
 
@@ -57,13 +74,13 @@ how prevelant are different kinds of success for each person (overall)
 profiles %>% ggplot( aes(num_sources) ) + geom_histogram(binwidth=1)
 ```
 
-![](post_files/figure-html/unnamed-chunk-3-1.png) 
+![](post_files/figure-html/unnamed-chunk-2-1.png) 
 
 ```r
 profiles %>% ggplot( aes(num_sources) ) + geom_histogram(binwidth=1, aes(y=cumsum(..count..)))
 ```
 
-![](post_files/figure-html/unnamed-chunk-3-2.png) 
+![](post_files/figure-html/unnamed-chunk-2-2.png) 
 
 ```r
 # number of posts
@@ -74,7 +91,7 @@ profiles %>% ggplot( aes(posts) ) + geom_histogram()
 ## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
 ```
 
-![](post_files/figure-html/unnamed-chunk-3-3.png) 
+![](post_files/figure-html/unnamed-chunk-2-3.png) 
 
 ```r
 profiles %>% ggplot( aes(posts) ) + geom_histogram() + scale_x_log10() 
@@ -84,7 +101,7 @@ profiles %>% ggplot( aes(posts) ) + geom_histogram() + scale_x_log10()
 ## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
 ```
 
-![](post_files/figure-html/unnamed-chunk-3-4.png) 
+![](post_files/figure-html/unnamed-chunk-2-4.png) 
 
 ```r
 profiles$posts %>% median
@@ -103,7 +120,7 @@ profiles %>% ggplot( aes(altmetric_score) ) + geom_histogram()
 ## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
 ```
 
-![](post_files/figure-html/unnamed-chunk-3-5.png) 
+![](post_files/figure-html/unnamed-chunk-2-5.png) 
 
 ```r
 profiles %>% ggplot( aes(altmetric_score) ) + geom_histogram() + scale_x_log10() 
@@ -113,7 +130,7 @@ profiles %>% ggplot( aes(altmetric_score) ) + geom_histogram() + scale_x_log10()
 ## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
 ```
 
-![](post_files/figure-html/unnamed-chunk-3-6.png) 
+![](post_files/figure-html/unnamed-chunk-2-6.png) 
 
 ```r
 profiles$altmetric_score %>% median
@@ -132,20 +149,20 @@ profiles %>% filter(altmetric_score < 250) %>% ggplot( aes(altmetric_score) ) + 
 ## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
 ```
 
-![](post_files/figure-html/unnamed-chunk-3-7.png) 
+![](post_files/figure-html/unnamed-chunk-2-7.png) 
 
 ```r
 # activity, as defined by having stuff in each of the last three months
 profiles %>% filter(monthly_event_count < 30) %>% ggplot( aes(monthly_event_count) ) + geom_histogram(binwidth=1)
 ```
 
-![](post_files/figure-html/unnamed-chunk-3-8.png) 
+![](post_files/figure-html/unnamed-chunk-2-8.png) 
 
 ```r
 profiles %>% filter(monthly_event_count < 30) %>% ggplot( aes(monthly_event_count) ) + geom_histogram(binwidth=1, aes(y=cumsum(..count..)))
 ```
 
-![](post_files/figure-html/unnamed-chunk-3-9.png) 
+![](post_files/figure-html/unnamed-chunk-2-9.png) 
 
 ```r
 # how many have monthly events at all
@@ -205,7 +222,7 @@ head(profiles)
 profiles %>%  ggplot(aes(num_sources, posts))  + geom_jitter(alpha=0.5) 
 ```
 
-![](post_files/figure-html/unnamed-chunk-4-1.png) 
+![](post_files/figure-html/unnamed-chunk-3-1.png) 
 
 ```r
 cor(profiles$num_sources, profiles$posts)
@@ -236,7 +253,7 @@ profiles %>%  ggplot(aes(posts, altmetric_score))  + geom_point(alpha=.2) + scal
 ## Warning: Removed 6 rows containing missing values (geom_point).
 ```
 
-![](post_files/figure-html/unnamed-chunk-5-1.png) 
+![](post_files/figure-html/unnamed-chunk-4-1.png) 
 
 ```r
 cor(log10(profiles$altmetric_score), log10(profiles$posts), use='complete.obs')
@@ -263,7 +280,7 @@ profiles %>%  ggplot(aes(twitter, altmetric_score))  + geom_point(alpha=0.2) + s
 ## Warning: Removed 6 rows containing missing values (geom_point).
 ```
 
-![](post_files/figure-html/unnamed-chunk-5-2.png) 
+![](post_files/figure-html/unnamed-chunk-4-2.png) 
 
 ```r
 cor(log10(profiles$altmetric_score), log10(profiles$twitter))
@@ -283,7 +300,7 @@ Lets take a look at the t-index
 profiles %>% ggplot( aes(t_index) ) + geom_histogram(binwidth=1, aes(y=cumsum(..count..)))
 ```
 
-![](post_files/figure-html/unnamed-chunk-6-1.png) 
+![](post_files/figure-html/unnamed-chunk-5-1.png) 
 
 ```r
 profiles$t_index %>% median
@@ -301,7 +318,7 @@ profiles %>%  ggplot(aes(t_index, altmetric_score))  + geom_jitter(alpha=0.2) + 
 ## Warning: Removed 6 rows containing missing values (geom_point).
 ```
 
-![](post_files/figure-html/unnamed-chunk-6-2.png) 
+![](post_files/figure-html/unnamed-chunk-5-2.png) 
 
 ```r
 cor(profiles$altmetric_score, profiles$t_index)
