@@ -13,7 +13,7 @@ Heather Piwowar and Jason Priem
 
 ## researcher-level altmetrics
 
-* This section still needs its citations...*
+_This section still needs its citations..._
  
 There's been a lot of work examining the distribution and properties of altmetrics at the level of individual papers, and sensibly so. Since this is the lowest level of aggregation, it's a great place to start. Researchers have also looked at altmetrics by journal, following a long trend of journal-level citation bibliometrics work. However, there's surprisingly little work on altmetrics at the *researcher* level. 
 
@@ -57,13 +57,13 @@ One downside of this approach is that we're only able to track mentions (Altmeti
 There are 6583 ( 39% ) of the samples profiles have more than 20 mentions. For the rest of this analysis, we'll focus on these profiles, for three reasons:
 
 1. They are a meaningful percentage of the dataset
-2. And they are a particularly interesting part of the dataset, because it gets us all the "early adopters" and then some, based on Rogers' Diffusion of Innovation framework *cite*. Moreover, our experience with Impactstory users has shown that users with more than 20 mentions are much more likely to be recommend altmetrics tools like Impactstory *link*. 
-3. The higher n for each profiles gives us more statistical ability to learn about altmetrics at the person level.
+2. The higher n for each profiles gives us more statistical ability to learn about altmetrics at the person level.
+2. And they are a particularly interesting part of the dataset, because it gets us all the "early adopters" and then some, based on Rogers' [Diffusion of Innovations](https://en.wikipedia.org/wiki/Diffusion_of_innovations) framework *(cite)*. Moreover, our experience with Impactstory users has shown that users with more than 20 mentions [are much more likely to be recommend altmetrics tools](http://blog.impactstory.org/nps/) like Impactstory. 
 
 
 ## What kind of online impact are they having?
 
-We looked at mention type by channel:
+What platforms are researchers' work being mentioned on? This is important, because of course each one mention is not the same as another. In particular, we know that researchers have different awareness of different kinds of online platforms. We're calling these different platforms or sources "channels."
 
 
 ```r
@@ -91,7 +91,7 @@ nonzero_channels %>% ggplot( aes(reorder(variable, variable, length)) ) +
 ![](post_files/figure-html/unnamed-chunk-1-1.png) 
 
 
-There is a tendancy for researchers to be mentioned on a similar number of channelss: 3104 people (47%) are mentioned on 3, 4, or 5 channels:
+So we can see that the majority of researchers in this set have mentions on Twitter, Facebook, news outlets, and blogs. We can look at the number of channels per researchers more explicitly by plotting how many distinct channels each profile has mentions from. We can see that the number of channels is centered around four, with 3104 people (47%) mentioned on 3, 4, or 5 channels:
 
 
 ```r
@@ -104,7 +104,7 @@ profiles %>% ggplot( aes(num_sources) ) + geom_histogram(binwidth=1)
 
 ## how much online impact are they having?
 
-There are a few ways to look at the total amount of online impact each researcher is having. We'll look at three:
+There are a few ways to look at the total amount of online impact each researcher is having. We'll examine three:
 
 * counts of mentions
 * source-weighted mention counts using Altmetric score
@@ -124,9 +124,12 @@ profiles$posts %>% median
 ```
 
 ### Source-weighted mention counts using Altmetric score
-*TODO write why weighted counts*
 
-Like the pure counts, the weighted ones are highly skewed. However, they have an interesting property that when we log-transform the bins, we get a relatively normal-shaped distribution, which is quite useful in many contexts:
+The total count is interesting, but of course mentions are not all created equal, and just summing mentions sweeps this under the rug. There's always been much interest in altmetrics research in weighting different types of mentions. There are a number of different kinds of weights we could use, depending on the questions we're asking;if we're interested in research impact we might look at F1000 mentions and online peer reviews, but if we're interested in impact on online discussion we might more heavily weight Facebook.
+
+Be far the most used weighting scheme, in practice, is the Altmetric Score. The score is *mostly* open and [details are available online](https://help.altmetric.com/support/solutions/articles/6000060969-how-is-the-altmetric-attention-score-calculated-), although some of the finer-grained weightings are not available. We can use the weights shared to approximate an Altmetric Score at the person level, by multiplying each mention of a person's work by its weight, then summing these. (It's an approximation because some weights are not shared online, eg of specific news sources, and also because Twitter weights are based on number of unique *tweeters* not Tweets.)
+
+Like the pure counts, the weighted count sums are highly skewed. However, they have an interesting property that is not true of pure mention counts: when we log-transform the bins, we get a relatively normal-shaped distribution, which is quite useful in many contexts. This difference is largely true because of the lower weight given to tweets in this system, which causes them to skew the distribution less.
 
 ```r
 # altmetric scores
@@ -156,19 +159,12 @@ profiles %>%  ggplot(aes(posts, altmetric_score))  + geom_point(alpha=.2) + scal
 ![](post_files/figure-html/unnamed-chunk-5-1.png) 
 
 ```r
-cor(log10(profiles$altmetric_score), log10(profiles$posts), use='complete.obs')
+# using nonparametric cor because massive skew
+cor(profiles$altmetric_score, profiles$posts, use='complete.obs', method="spearman")
 ```
 
 ```
-## [1] NaN
-```
-
-```r
-cor(profiles$altmetric_score, profiles$posts, use='complete.obs')  # makes no difference
-```
-
-```
-## [1] 0.8235586
+## [1] 0.8359033
 ```
 
 Interestingly, there is quite a bit of correlation here, suggesting that (at a high level of aggregation) maybe a simple count of mentions is giving us a lot of the information we'd get from a weighted sum. We pushed this a bit further to see if there's good correlation between simply counting the summed number of tweets per profile, and using the summed Altmetric score:
@@ -186,14 +182,17 @@ profiles %>%  ggplot(aes(twitter, altmetric_score))  + geom_point(alpha=0.2) + s
 ![](post_files/figure-html/unnamed-chunk-6-1.png) 
 
 ```r
-cor(log10(profiles$altmetric_score), log10(profiles$twitter))
+cor(profiles$altmetric_score, profiles$twitter, use='complete.obs', method="spearman")
 ```
 
 ```
-## [1] NA
+## [1] 0.7398921
 ```
 
-Again, we see that there is a strong relationship. This is both because tweets make up a large part of the Altmetric score (since they are so prevelant), and because impact on different social channels tends to be fairly well-correlated as much previous research has shown *(cite)*.
+Again, we see that there is a strong relationship. This is both because tweets make up a large part of the Altmetric score (since they are so prevelant), and because impact on different social channels tends to be fairly well-correlated as much previous research has shown *(cite)*. It's interesting to thing that at a coarse level, we can estimate a lot about the altmetrics impact of researchers by simply counting the number of times their research has been tweeted. 
+
+Of course we would not want to do evaluate individuals using this relationship since there are numerous outliers. Future research should look more closely into these outliers, investigating what kind of people tend to have an unsually high or low percentage of "low-value" or "high-value" channels. And more importantly, we need more research on ways to weight mentions that go beyond simply noting the channel--since the "value" of a tweets, for instance, depends greatly on its context and author.
+
 
 ### Twitter h-index ("t-index")
 
@@ -218,11 +217,12 @@ profiles$t_index %>% median
 ```
 
 
-We find the t-index correlates with tweet counts, but not that closely.
+We find the t-index has moderate to high correlation with both the Altmetrics score and the raw posts count. This is unsurprising given that the traditional h-index has also been shown to [correlate well with raw citation counts](http://eprints.rclis.org/8790/).
+
 
 
 ```r
-profiles %>%  ggplot(aes(t_index, altmetric_score))  + geom_jitter(alpha=0.2) + scale_x_log10() + scale_y_log10() 
+profiles %>%  ggplot(aes(t_index, altmetric_score))  + geom_jitter(alpha=0.2) + scale_x_log10() + scale_y_log10()
 ```
 
 ```
@@ -230,6 +230,22 @@ profiles %>%  ggplot(aes(t_index, altmetric_score))  + geom_jitter(alpha=0.2) + 
 ```
 
 ![](post_files/figure-html/unnamed-chunk-8-1.png) 
+
+```r
+cor(profiles$altmetric_score, profiles$t_index, use='complete.obs', method="spearman")
+```
+
+```
+## [1] 0.6301717
+```
+
+```r
+cor(profiles$posts, profiles$t_index, use='complete.obs', method="spearman")
+```
+
+```
+## [1] 0.7502881
+```
 
 ## Still in progress
 
