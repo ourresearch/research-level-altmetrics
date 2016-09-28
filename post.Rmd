@@ -69,6 +69,7 @@ Finding data at the reseacher level is not simple, since many commercial researc
 Using ORCID profiles does have some difficulties. Unlike systems such as Google Scholar, ORCID does not automatically add a users' publications. It must be done manually, and it is not a particularly user-friendly process. Because of this, most ORCIDs do not include a complete publication list. This is particularly true since most  ORCIDs are created as part of a single-signon flow for another system (an academic version of the ubiquitous "sign in with Facebook" button). These users just want an account, and have no interest in making a complete publication list.
 
 We solved this problem by using clues in ORCID records to find users who have spent significant amounts of time editing their profiles, on the assumption that these users are likely to have assembled a relatively complete publication list. After trying several different clues, we settled on two: users were more likely to have complete publications list if they 
+
 1. Had at least one publication with a DOI from 2015 and
 2. Had added a custom URL to their homepage.
 
@@ -95,6 +96,7 @@ One downside of this approach is that we're only able to track mentions (Altmeti
 | More than 200 | 1344 |
 
 There are 6583 ( 39% ) of the samples profiles have more than 20 mentions. For the rest of this analysis, we'll focus on these profiles, for three reasons:
+
 1. They are a meaningful percentage of the dataset
 2. And they are a particularly interesting part of the dataset, because it gets us all the "early adopters" and then some, based on Rogers' Diffusion of Innovation framework *cite*. Moreover, our experience with Impactstory users has shown that users with more than 20 mentions are much more likely to be recommend altmetrics tools like Impactstory *link*. 
 3. The higher n for each profiles gives us more statistical ability to learn about altmetrics at the person level.
@@ -131,7 +133,8 @@ profiles %>% ggplot( aes(num_sources) ) + geom_histogram(binwidth=1)
 
 ## how much online impact are they having?
 
-There are a few ways to look at the total amount of online impact each researcher is having. We'll look at three: 
+There are a few ways to look at the total amount of online impact each researcher is having. We'll look at three:
+
 * counts of mentions
 * source-weighted mention counts using Altmetric score
 * Twitter h-index ("t-index")
@@ -146,19 +149,13 @@ profiles$posts %>% median
 ```
 
 ### Source-weighted mention counts using Altmetric score
+*TODO write why weighted counts*
 
-
-
+Like the pure counts, the weighted ones are highly skewed. However, they have an interesting property that when we log-transform the bins, we get a relatively normal-shaped distribution, which is quite useful in many contexts:
 ```{r}
 
 # altmetric scores
-profiles %>% ggplot( aes(altmetric_score) ) + geom_histogram()
 profiles %>% ggplot( aes(altmetric_score) ) + geom_histogram() + scale_x_log10() 
-profiles$altmetric_score %>% median
-
-# altmetric scores, zoom in on the meat
-profiles %>% filter(altmetric_score < 250) %>% ggplot( aes(altmetric_score) ) + geom_histogram()
-
 ```
 
 #### Relationship between weighted and unweighted counts
@@ -212,6 +209,7 @@ profiles %>%  ggplot(aes(t_index, altmetric_score))  + geom_jitter(alpha=0.2) + 
 ## Still in progress
 
 As you can see this is still very much a work in progress. Here's what we're still working on:
+
 * For most people, most mentions are tweets. It will be cool to have a plot that shows this.
 * We have data for the distribution of mentions over time. We need to describe this still.
 * It's going to be really interesting to describe and plot the relationship between altmetric-based indicators (number of mentions, weighted mention counts, t-index) and traditional citation metrics for our sample. This has been done to death at the publication level, but not yet at person level so much.
